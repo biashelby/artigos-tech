@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IA + Kali Linux — O futuro da Cibersegurança</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --green: #00ff88;
+    --cyan: #00e5ff;
+    --purple: #a855f7;
+    --text: #e2e8f0;
+    --muted: #6b7280;
+    --red: #ff4444;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .article {
+    max-width: 720px;
+    width: 100%;
+    position: relative;
+  }
+
+  /* HEADER */
+  .header {
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 4px 10px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    border-left: 2px solid var(--green);
+    padding-left: 16px;
+    margin-top: 12px;
+  }
+
+  /* TERMINAL BLOCK */
+  .terminal {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 32px 0;
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    background: #161b22;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; }
+  .dot.y { background: #febc2e; }
+  .dot.g { background: #28c840; }
+
+  .terminal-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  .terminal-body {
+    padding: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .prompt { color: var(--green); }
+  .cmd { color: var(--cyan); }
+  .comment { color: var(--muted); }
+  .output { color: #94a3b8; margin-left: 16px; }
+  .highlight { color: var(--green); }
+
+  /* SECTIONS */
+  section { margin: 40px 0; }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h2::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 20px;
+    background: var(--green);
+    border-radius: 2px;
+  }
+
+  p {
+    color: #94a3b8;
+    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  strong { color: var(--text); }
+
+  /* COMPARISON CARDS */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 500px) { .compare { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .card.bad { border-top: 2px solid var(--red); }
+  .card.good { border-top: 2px solid var(--green); }
+
+  .card-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .card.bad .card-label { color: var(--red); }
+  .card.good .card-label { color: var(--green); }
+
+  .card p { font-size: 13px; margin-bottom: 8px; color: var(--muted); }
+
+  /* FEATURE LIST */
+  .features {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .feature {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .feature:hover {
+    border-color: var(--green);
+    transform: translateX(4px);
+  }
+
+  .feature-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .feature h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .feature p { font-size: 13px; color: var(--muted); margin: 0; }
+
+  /* WARNING BOX */
+  .warning {
+    background: rgba(255, 68, 68, 0.07);
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 32px 0;
+  }
+
+  .warning-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--red);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .warning p { font-size: 13px; color: #94a3b8; margin: 0; }
+
+  /* FLOW */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+  }
+
+  .flow-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+  }
+
+  .flow-arrow { color: var(--muted); font-size: 18px; }
+
+  /* FOOTER */
+  footer {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .hashtags {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--purple);
+    line-height: 2;
+  }
+
+  .cta {
+    display: inline-block;
+    margin-top: 20px;
+    background: var(--green);
+    color: #000;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 28px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .cta:hover { opacity: 0.85; }
+
+  /* scan line effect */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+<article class="article">
+
+  <header class="header">
+    <div class="tag">// CYBERSECURITY + AI · 2025</div>
+    <h1>IA no Kali Linux:<br>o copiloto dos hackers éticos chegou</h1>
+    <p class="subtitle">Como a integração entre Claude e Kali Linux via MCP está mudando o trabalho de pentesters — e o que isso significa para quem quer entrar na área de segurança.</p>
+  </header>
+
+  <section>
+    <p>Por muito tempo, dominar cibersegurança significava memorizar uma lista interminável de comandos, flags e sintaxes. Hoje, esse cenário começa a mudar — e de forma radical.</p>
+    <p>O <strong>Kali Linux</strong>, a distribuição favorita de profissionais de segurança ofensiva, agora pode ser integrado com modelos de IA como o <strong>Claude</strong> através do <strong>Model Context Protocol (MCP)</strong>. O resultado? Um ambiente onde você fala em linguagem natural e a IA executa no terminal.</p>
+  </section>
+
+  <section>
+    <h2>Antes vs. Agora</h2>
+
+    <div class="compare">
+      <div class="card bad">
+        <div class="card-label">❌ ANTES — MANUAL</div>
+        <div class="terminal" style="margin:0; border:none; background:transparent;">
+          <div class="terminal-body" style="padding:0; font-size:12px;">
+            <div><span class="prompt">$</span> <span class="cmd">nmap -sV scanme.nmap.org</span></div>
+            <div><span class="prompt">$</span> <span class="cmd">gobuster dir -u https://site.com \</span></div>
+            <div style="padding-left:16px"><span class="cmd">-w wordlist.txt</span></div>
+          </div>
+        </div>
+        <p style="margin-top:12px;">Exige experiência, memorização e muito tempo.</p>
+      </div>
+
+      <div class="card good">
+        <div class="card-label">✅ AGORA — COM IA</div>
+        <div style="background:#0a1f12; border-radius:6px; padding:12px; margin-bottom:12px;">
+          <p style="color: var(--green); font-family: 'Space Mono', monospace; font-size:12px; margin:0; font-style:italic;">"Faça um port scan em scanme.nmap.org e verifique se existe um security.txt"</p>
+        </div>
+        <p>A IA interpreta → escolhe as ferramentas → executa → retorna resultados.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Como funciona o MCP?</h2>
+    <p>O <strong>Model Context Protocol</strong> é a ponte que conecta a inteligência da IA ao ambiente real de segurança. Pense nele como uma API especializada que permite ao modelo:</p>
+
+    <div class="flow">
+      <div class="flow-item">🧠 IA (Claude)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">⚙️ MCP</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">💻 Kali Linux</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item">🔧 Ferramentas</div>
+    </div>
+
+    <p>Na prática: você escreve o que precisa, o MCP garante que o modelo entenda o contexto do ambiente, envie comandos ao sistema operacional, receba os outputs e os interprete para você.</p>
+  </section>
+
+  <section>
+    <h2>Por que isso é importante?</h2>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <h3>Velocidade de execução</h3>
+          <p>Tarefas que levavam dezenas de comandos manuais passam a ser descritas em uma frase. O ciclo de análise encurta drasticamente.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div>
+          <h3>Menos erros de sintaxe</h3>
+          <p>Flags erradas, wordlists esquecidas, parâmetros invertidos — a IA padroniza a execução e reduz o ruído humano.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🚀</div>
+        <div>
+          <h3>Democratização da segurança</h3>
+          <p>Profissionais em formação conseguem executar tarefas complexas enquanto ainda aprendem os fundamentos. A curva de entrada diminui.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🧠</div>
+        <div>
+          <h3>Foco estratégico</h3>
+          <p>Especialistas deixam de ser "digitadores de comandos" e passam a ser analistas: interpretando resultados, tomando decisões, escalando ataques simulados com inteligência.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="warning">
+    <div class="warning-title">⚠ AVISO IMPORTANTE</div>
+    <p>Esta tecnologia é voltada exclusivamente para <strong>pentests autorizados</strong>, auditorias de segurança e ambientes controlados. Usar ferramentas de invasão sem autorização explícita é <strong>crime</strong>. Ética e legalidade são inegociáveis na carreira de segurança.</p>
+  </div>
+
+  <section>
+    <h2>O perfil do profissional que vem aí</h2>
+    <p>A combinação de IA com cibersegurança não substitui o especialista — ela <strong>redefine o que ele precisa saber</strong>. O profissional do futuro próximo vai precisar:</p>
+
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span class="terminal-title">profile.sh — futuro_profissional</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="prompt">$</span> <span class="cmd">cat skills_required.txt</span></div>
+        <div class="output"></div>
+        <div class="output"><span class="highlight">✔</span> Fundamentos sólidos de redes e sistemas</div>
+        <div class="output"><span class="highlight">✔</span> Capacidade de interpretar e validar outputs de IA</div>
+        <div class="output"><span class="highlight">✔</span> Pensamento estratégico em segurança ofensiva/defensiva</div>
+        <div class="output"><span class="highlight">✔</span> Saber quando confiar — e quando questionar — a máquina</div>
+        <div class="output"><span class="highlight">✔</span> Ética e responsabilidade como pilares inegociáveis</div>
+        <div class="output"></div>
+        <div><span class="prompt">$</span> <span class="comment"># menos memorização → mais análise</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p>Estamos vendo em tempo real a <strong>convergência entre inteligência artificial e segurança da informação</strong>. Não é hype — é uma mudança estrutural na forma como profissionais vão trabalhar. Quem entender isso agora sai na frente.</p>
+    <p>E você, já está pensando em como posicionar sua carreira nesse cenário? 💬</p>
+  </section>
+
+  <footer>
+    <div class="hashtags">
+      #Cibersegurança &nbsp;·&nbsp; #InteligênciaArtificial &nbsp;·&nbsp; #KaliLinux &nbsp;·&nbsp; #Pentest &nbsp;·&nbsp; #Segurança &nbsp;·&nbsp; #CarreiraTech &nbsp;·&nbsp; #MCP &nbsp;·&nbsp; #HackingÉtico
+    </div>
+  </footer>
+
+</article>
+</body>
+</html>
